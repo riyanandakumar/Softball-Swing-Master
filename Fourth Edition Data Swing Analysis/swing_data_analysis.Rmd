@@ -1,0 +1,131 @@
+---
+title: "Swing Data Analysis"
+author: "Riya Nandakumar"
+date: "7/31/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Swing Analysis
+
+This is R Markdown document is for the purposes of examining the swing data and differences between the means of the four different types of swings (good swing, little pivot, wild pivot, back leg pick up). After examination, features for the machine learning model will be picked out and utilized in CreateML. This examination is for the datasets using Device Motion data, with intentions of creating an iOS app for the classification model.
+
+```{r}
+# load in tidyverse packages
+library(tidyverse)
+```
+
+Differences in Accelerometer Axis X Means:
+```{r}
+# list of all .csvs in the directory
+file_names <- list.files(pattern = '*.csv')
+
+ax_mean_results <- c()
+
+for (file in file_names){
+  # read in file
+  ax_mean_results <- read_csv(file) %>%
+    # means of accelerometer / gyroscope
+    summarize(mean_aX = mean(motionUserAccelerationX)) %>%
+    # save file name
+    mutate(file) %>%
+    # remove the .csv ending part
+    mutate(file = gsub('\\.csv', '', file),
+           category = gsub('\\d', '', file)) %>%
+    # append to previous results
+    bind_rows(ax_mean_results, .)
+}
+# results visualization
+boxplot(mean_aX ~ category, data = ax_mean_results, title = "Means of Accelerometer Axis X")
+```
+
+Differences in Accelerometer Axis Y Means:
+```{r}
+ay_mean_results <- c()
+
+for (file in file_names){
+  
+  ay_mean_results <- read_csv(file) %>%
+    summarize(mean_aY = mean(motionUserAccelerationY)) %>%
+    mutate(file) %>%
+    mutate(file = gsub('\\.csv', '', file),
+           category = gsub('\\d', '', file)) %>%
+    bind_rows(ay_mean_results, .)
+}
+
+boxplot(mean_aY ~ category, data = ay_mean_results, title = "Means of Accelerometer Axis Y")
+```
+
+Differences in Accelerometer Axis Z Means:
+```{r}
+az_mean_results <- c()
+
+for (file in file_names){
+
+  az_mean_results <- read_csv(file) %>%
+    summarize(mean_aZ = mean(motionUserAccelerationZ)) %>%
+    mutate(file) %>%
+    mutate(file = gsub('\\.csv', '', file),
+           category = gsub('\\d', '', file)) %>%
+    bind_rows(az_mean_results, .)
+}
+
+boxplot(mean_aZ ~ category, data = az_mean_results, title = "Means of Accelerometer Axis Z")
+```
+
+Differences in Gyroscope Axis X Means:
+```{r}
+gx_mean_results <- c()
+
+for (file in file_names){
+  
+  gx_mean_results <- read_csv(file) %>%
+    summarize(mean_gX = mean(motionRotationRateX)) %>%
+    mutate(file) %>%
+    mutate(file = gsub('\\.csv', '', file),
+           category = gsub('\\d', '', file)) %>%
+    bind_rows(gx_mean_results, .)
+}
+
+boxplot(mean_gX ~ category, data = gx_mean_results, title = "Means of Gyroscope Axis X")
+```
+
+Differences in Gyroscope Axis Y Means:
+```{r}
+gy_mean_results <- c()
+
+for (file in file_names){
+  
+  gy_mean_results <- read_csv(file) %>%
+    summarize(mean_gY = mean(motionRotationRateY)) %>%
+    mutate(file) %>%
+    mutate(file = gsub('\\.csv', '', file),
+           category = gsub('\\d', '', file)) %>%
+    bind_rows(gy_mean_results, .)
+}
+
+boxplot(mean_gY ~ category, data = gy_mean_results, title = "Means of Gyroscope Axis Y")
+```
+
+Differences in Gyroscope Axis Z Means:
+```{r}
+gz_mean_results <- c()
+
+for (file in file_names){
+  
+  gz_mean_results <- read_csv(file) %>%
+    summarize(mean_gZ = mean(motionRotationRateZ)) %>%
+    mutate(file) %>%
+    mutate(file = gsub('\\.csv', '', file),
+           category = gsub('\\d', '', file)) %>%
+    bind_rows(gz_mean_results, .)
+}
+
+boxplot(mean_gZ ~ category, data = gz_mean_results, title = "Means of Gyroscope Axis Z")
+```
+
+Summary:
+From the data visualization presented above, the features I will strive to use in my machine learning model are the accelerometer's Y and Z axis, and the gyroscope's X axis. These axises have the biggest differences between swing types, making classification much easier. If needed, the CreateML model can easily utilize the other discarded features; however I will only add these in if the model could improve significantly. (apologies for the pages of column pasring specifications in the knitted pdf)
